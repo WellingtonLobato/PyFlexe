@@ -1,18 +1,28 @@
 # PyFlexe
-FLEXE is a new framework for simulation of Federated Learning (FL) in Connected and Autonomous Vehicle (CAVs). Its adaptable design allows for the implementation of a variety of FL schemes, including horizontal, vertical, and Federated Transfer Learning. FLEXE is free to download and use, built for customization, and allows for the realistic simulation of wireless networking and vehicle dynamics.
+PyFlexe is a new framework for simulation of Federated Learning (FL) in Connected and Autonomous Vehicle (CAVs). Its adaptable design allows for the implementation of a variety of FL schemes, including horizontal, vertical, and Federated Transfer Learning. PyFlexe is free to download and use, built for customization, and allows for the realistic simulation of wireless networking and vehicle dynamics. The project was partitioned into two, one of which is responsible for vehicle-to-vehicle communication (Flexe) and the other for the construction and training of models (PyFlexe).
 
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
+PyFlexe requires the following software to be installed 
 
-OMNeT++:
--6.0
-SUMO:
--
-Veins:
--5.2
+- OMNeT++ 6
+- conan
+- grpc
+- TensorFlow
+- PyTorch
+
+### OMNeT++ 6 installation
+Please do follow the instructions from the official [OMNeT documentation](https://doc.omnetpp.org/omnetpp/InstallGuide.pdf)
+
+
+### Conan installation
+Please do follow the instructions from the official [conan documentation](https://docs.conan.io/en/latest/installation.html)
+
+### GRPC installation
+Please do follow the instructions from the official [grpc documentation](https://grpc.io/docs/languages/python/quickstart/)
 
 ```
 Give examples
@@ -72,34 +82,31 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+We use [SemVer](http://semver.org/) for versioning. 
 
 ## Authors
 
-* **Wellington Lobato** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-* **Joahannes B. D. da Costa** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-* **Allan M. de Souza** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-* **Denis Rosario** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-* **Christoph Sommer** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-* **Leandro A. Villas** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Wellington Lobato** - [WellingtonLobato](https://github.com/WellingtonLobato)
+* **Joahannes B. D. da Costa** - [joahannes](https://github.com/joahannes)
+* **Allan M. de Souza** - [AllanMSouza](https://github.com/AllanMSouza)
+* **Denis Rosario**
+* **Christoph Sommer** - [sommer](https://github.com/sommer)
+* **Leandro A. Villas**
 
+# Citation
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+PyFlexe and Flexe can reproduce results in the following papers:
+
+```tex
+@INPROCEEDINGS{Lobato2022,
+  author={Lobato, Wellington and Costa, Joahannes B. D. Da and Souza, Allan M. de and Rosário, Denis and Sommer, Christoph and Villas, Leandro A.},
+  booktitle={2022 IEEE 96th Vehicular Technology Conference (VTC2022-Fall)}, 
+  title={FLEXE: Investigating Federated Learning in Connected Autonomous Vehicle Simulations}, 
+  year={2022},
+  pages={1-5},
+  doi={10.1109/VTC2022-Fall57202.2022.10012905}
+}
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
-
-
-conan install . --build missing -s compiler.version=10 -s compiler.libcxx=libstdc++11
-
-PROTO_IN_PATH=/home/jordan/git/Flexe2.0.0/
-PROTO_FILE=/home/jordan/git/Flexe2.0.0/flexe.proto
-PROTO_OUT_PATH=/home/jordan/git/Flexe2.0.0/src/flexe/proto/
-
