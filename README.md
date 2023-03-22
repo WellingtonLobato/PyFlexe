@@ -17,16 +17,17 @@ PyFlexe requires the following software to be installed
 ### OMNeT++ 6 installation
 Please do follow the instructions from the official [OMNeT documentation](https://doc.omnetpp.org/omnetpp/InstallGuide.pdf)
 
-
 ### Conan installation
 Please do follow the instructions from the official [conan documentation](https://docs.conan.io/en/latest/installation.html)
 
 ### GRPC installation
 Please do follow the instructions from the official [grpc documentation](https://grpc.io/docs/languages/python/quickstart/)
 
-```
-Give examples
-```
+### TensorFlow installation
+Please do follow the instructions from the official [grpc documentation](https://grpc.io/docs/languages/python/quickstart/)
+
+### PyTorch installation
+Please do follow the instructions from the official [grpc documentation](https://grpc.io/docs/languages/python/quickstart/)
 
 ### Installing
 
@@ -70,12 +71,6 @@ Give an example
 
 Add additional notes about how to deploy this on a live system
 
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
 ## Contributing
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
@@ -106,6 +101,7 @@ PyFlexe and Flexe can reproduce results in the following papers:
   pages={1-5},
   doi={10.1109/VTC2022-Fall57202.2022.10012905}
 }
+```
 
 ## License
 
