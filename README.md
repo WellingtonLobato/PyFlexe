@@ -27,10 +27,10 @@ Please do follow the instructions from the official [conan documentation](https:
 ### GRPC installation
 Please do follow the instructions from the official [grpc documentation](https://grpc.io/docs/languages/python/quickstart/)
 
-### TensorFlow installation
+### TensorFlow installation ()
 Please do follow the instructions from the official [grpc documentation](https://grpc.io/docs/languages/python/quickstart/)
 
-### PyTorch installation
+### PyTorch installation ()
 Please do follow the instructions from the official [grpc documentation](https://grpc.io/docs/languages/python/quickstart/)
 
 ### Installing
