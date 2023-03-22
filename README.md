@@ -18,20 +18,20 @@ PyFlexe requires the following software to be installed
 - TensorFlow
 - PyTorch
 
-### OMNeT++ 6 installation
+### OMNeT++ (6 >=) installation
 Please do follow the instructions from the official [OMNeT documentation](https://doc.omnetpp.org/omnetpp/InstallGuide.pdf)
 
 ### Conan installation
 Please do follow the instructions from the official [conan documentation](https://docs.conan.io/en/latest/installation.html)
 
 ### GRPC installation
-Please do follow the instructions from the official [grpc documentation](https://grpc.io/docs/languages/python/quickstart/)
+Please do follow the instructions from the official [GRPC documentation](https://grpc.io/docs/languages/python/quickstart/)
 
-### TensorFlow installation ()
-Please do follow the instructions from the official [grpc documentation](https://grpc.io/docs/languages/python/quickstart/)
+### TensorFlow installation (2.11.0 >=)
+Please do follow the instructions from the official [TensorFlow documentation](https://www.tensorflow.org/install)
 
-### PyTorch installation ()
-Please do follow the instructions from the official [grpc documentation](https://grpc.io/docs/languages/python/quickstart/)
+### PyTorch installation (1.13.1 >=)
+Please do follow the instructions from the official [PyTorch documentation](https://pytorch.org/tutorials/beginner/basics/intro.html)
 
 ### Installing
 
