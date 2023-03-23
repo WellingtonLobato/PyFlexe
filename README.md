@@ -71,9 +71,31 @@ Explain what these tests test and why
 Give an example
 ```
 
-## Deployment
+## Project structure - main components 
 
-Add additional notes about how to deploy this on a live system
+Each strategy is evaluated through `simulation.py` which creates the set of clients and the server of the selected strategy under the given setting.
+Additionally, FedLTA can generate various visualizations to help researchers to analyze the results (see folder `analysis`).
+
+    ├── analysis 			# Tables and plots creation - Folder
+    ├── client 			# Client-side code - Folder
+    │   ├── client_tf		# Client-side code for TensorFlow - Folder
+    │   ├── client_torch		# Client-side code for Pytorch - Folder
+    ├── data			# Datasets - Folder
+    ├── dataset_utils_torch.py	# Dataset utilities for Pytorch
+    ├── exc_all.sh			# Executes all the experiments
+    ├── exc_joint_plot.sh		# Generates joint plots 
+    ├── exec_simulation.py		# Executes the selected experiment
+    ├── execution_log		# Contains the terminal logs of each executed experiment - Folder
+    ├── log_exc_all.txt
+    ├── logs			# Contains the results of each executed experiment - Folder
+    ├── model_definition_tf.py	# Deep learning models in TensorFlow
+    ├── model_definition_torch.py	# Deep learning models in Pytorch
+    ├── push_logs.sh		# Pushes the generated logs to GitHub 
+    ├── server			# Server-side code
+    │   ├── common_base_server	# Common base server code (i.e., it is independent of Tensorflow and Pytorch) - Folder
+    │   ├── server_tf		# TensorFlow-specific implementations of servers - Folder
+    │   └── server_torch		# Pytorch-specific implementations of servers - Folder
+    ├── simulation.py		# Main file. Executes the selected strategy in the Federated |Learning under the specified setting
 
 ## Contributing
 
