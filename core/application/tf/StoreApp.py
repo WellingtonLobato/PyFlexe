@@ -11,6 +11,7 @@ import tensorflow as tf
 from core.server.parameter import ndarrays_to_parameters, parameters_to_ndarrays, bytes_to_ndarray, ndarray_to_bytes
 from core.server.aggregate import aggregate, aggregate_asynchronous, aggregate_asynchronous_alpha
 from core.dataset.dataset_utils_tf import ManageDatasets
+from core.model.model_definition_tf import ModelCreation
 from glob import glob
 
 
@@ -23,6 +24,8 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
         self.dataset = dataset
         self.n_clients = n_clients
         self.non_iid = non_iid
+        self.num_classes = 10 #Pegar automatico
+        self.device = tf.device("cuda:0" if tf.test.is_gpu_available() else "cpu")
         if non_iid == False:
             self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(self.dataset, self.n_clients, self.non_iid)
         else:
@@ -201,15 +204,7 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
         initial_path = request.modelName+"initial.h5"
 
         # TRAINING PROCESS
-        #CREATE GENERIC MODEL
-        model = tf.keras.models.Sequential([
-            tf.keras.layers.Flatten(input_shape=(28, 28)),
-            tf.keras.layers.Dense(128, activation="relu"),
-            tf.keras.layers.Dropout(0.2),
-            tf.keras.layers.Dense(10, activation="softmax"),
-        ])
-        model.compile("adam", "sparse_categorical_crossentropy", metrics=["accuracy"])
-        #CREATE GENERIC MODEL
+        model = ModelCreation().create_generic_model(self.x_train.shape, self.num_classes)
 
         history = model.fit(self.x_train, self.y_train, epochs=request.epochs, batch_size=int(request.batch_size))
         model.save(model_path)
