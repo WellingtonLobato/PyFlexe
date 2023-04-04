@@ -12,7 +12,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 PyFlexe requires the following software to be installed 
 
-- OMNeT++ 6
+- OMNeT++
 - conan
 - grpc
 - TensorFlow
@@ -35,71 +35,46 @@ Please do follow the instructions from the official [PyTorch documentation](http
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
+In order to install the necessary packages to run PyFlexe, just run the following command in the root directory.
 
 ```
-Give the example
+poetry install
 ```
 
-And repeat
+
+## Running the server
 
 ```
-until finished
+python server_flexe.py --ip 127.0.0.1 --dataset MNIST
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
 
 ## Project structure - main components 
 
-Each strategy is evaluated through `simulation.py` which creates the set of clients and the server of the selected strategy under the given setting.
-Additionally, FedLTA can generate various visualizations to help researchers to analyze the results (see folder `analysis`).
+	├── core
+	│   ├── application
+	│   │   ├── tf
+	│   │   └── torch
+	│   ├── dataset
+	│   ├── model
+	│   ├── proto
+	│   └── server
+	│       ├── common
+	├── data
+	│   ├── CIFAR10
+	│   ├── MNIST
+	│   ├── motion_sense
+	│   └── UCI-HAR
+	├── doc
+	├── download.sh
+	├── img
+	│   └── Flexe_logo.png
+	└── server_flexe.py
 
-    ├── analysis 			# Tables and plots creation - Folder
-    ├── client 			# Client-side code - Folder
-    │   ├── client_tf		# Client-side code for TensorFlow - Folder
-    │   ├── client_torch		# Client-side code for Pytorch - Folder
-    ├── data			# Datasets - Folder
-    ├── dataset_utils_torch.py	# Dataset utilities for Pytorch
-    ├── exc_all.sh			# Executes all the experiments
-    ├── exc_joint_plot.sh		# Generates joint plots 
-    ├── exec_simulation.py		# Executes the selected experiment
-    ├── execution_log		# Contains the terminal logs of each executed experiment - Folder
-    ├── log_exc_all.txt
-    ├── logs			# Contains the results of each executed experiment - Folder
-    ├── model_definition_tf.py	# Deep learning models in TensorFlow
-    ├── model_definition_torch.py	# Deep learning models in Pytorch
-    ├── push_logs.sh		# Pushes the generated logs to GitHub 
-    ├── server			# Server-side code
-    │   ├── common_base_server	# Common base server code (i.e., it is independent of Tensorflow and Pytorch) - Folder
-    │   ├── server_tf		# TensorFlow-specific implementations of servers - Folder
-    │   └── server_torch		# Pytorch-specific implementations of servers - Folder
-    ├── simulation.py		# Main file. Executes the selected strategy in the Federated |Learning under the specified setting
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
