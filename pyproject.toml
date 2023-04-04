@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "PyFlexe"
+version = "1.0.0"
+description = "Flexe is a new framework for simulation of Federated Learning (FL) in Connected and Autonomous Vehicle (CAVs). Its adaptable design allows for the implementation of a variety of FL schemes, including horizontal, vertical, and Federated Transfer Learning. Flexe and PyFlexe are free to download and use, built for customization, and allows for the realistic simulation of wireless networking and vehicle dynamics. The project was partitioned into two, one of which is responsible for vehicle-to-vehicle communication (Flexe) and the other for the construction and training of models (PyFlexe)."
+authors = ["WellingtonLobato <wellington.lobato.junior@gmail.com>"]
+license = "GPL-2.0"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+grpc = "1.51.1"
+tensorflow = "2.11.0"
+numpy = "1.24.2"
+pandas = "1.5.3"
+protobuf = "^4.22.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
