@@ -59,7 +59,7 @@ python server_flexe.py --ip 127.0.0.1 --dataset MNIST
 	│   ├── model
 	│   ├── proto
 	│   └── server
-	│       ├── common
+	│       └── common
 	├── data
 	│   ├── CIFAR10
 	│   ├── MNIST
