@@ -8,12 +8,11 @@ import gc
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 import tensorflow as tf
-from core.server.parameter import ndarrays_to_parameters, parameters_to_ndarrays, bytes_to_ndarray, ndarray_to_bytes
-from core.server.aggregate import aggregate, aggregate_asynchronous, aggregate_asynchronous_alpha
+from core.server.common.parameter import ndarrays_to_parameters, parameters_to_ndarrays, bytes_to_ndarray, ndarray_to_bytes
+from core.server.common.aggregate import aggregate, aggregate_asynchronous, aggregate_asynchronous_alpha
 from core.dataset.dataset_utils_tf import ManageDatasets
 from core.model.model_definition_tf import ModelCreation
 from glob import glob
-
 
 global model_path, initial_path
 model_path = ""
@@ -26,22 +25,25 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
         self.non_iid = non_iid
         self.num_classes = 10 #Pegar automatico
         self.device = tf.device("cuda:0" if tf.test.is_gpu_available() else "cpu")
-        if non_iid == False:
-            self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(self.dataset, self.n_clients, self.non_iid)
-        else:
-            self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(self.dataset, self.n_clients, False) 
                
     #Server Functions 
-    def server_evaluate(self, request, context):      
+    def server_evaluate(self, request, context):
+        print(
+        "SERVER - SERVER_EVALUATE",
+        " modelName: ", request.modelName, 
+        " epochs: ", request.epochs, 
+        " batch_size: ", request.batch_size
+        )      
         return flexe_pb2.EvaluateReply(loss=int(7), accuracy=int(77))
 
     def aggregate_evaluate(self, request, context):
         global model_path
-                
-        print("SERVER - AGGREGATE_EVALUATE datasetPath: ", 
-        request.datasetPath, " modelName: ", 
-        request.modelName, " epochs: ", 
-        request.epochs, " batch_size: ", request.batch_size)
+        self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(dataset_name=self.dataset, n_clients=1, non_iid=False) #All Data                       
+        print("SERVER - AGGREGATE_EVALUATE",
+        " modelName: ", request.modelName, 
+        " epochs: ", request.epochs, 
+        " batch_size: ", request.batch_size
+        )
 
         loss = -1
         accuracy = -1
@@ -52,6 +54,7 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
         if isExist:
             model = tf.keras.models.load_model(fileName)
             data = model.evaluate(self.x_test, self.y_test, batch_size=int(request.batch_size))
+            print("\n")
             loss = float(data[0])
             accuracy = float(data[1])
             history={}
@@ -60,7 +63,7 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
             with open(fileName.replace("h5", "txt"), 'a') as file_save:
                 file_save.write("AGGREGATE_EVALUATE: "+str(history)+"\n")
         else:
-            print("AGGREGATE_EVALUATE VOID_MODEL")
+            print("SERVER - AGGREGATE_EVALUATE (VOID_MODEL)")
             model = []
         # LOAD MODEL
 
@@ -74,12 +77,16 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
 
 
     def aggregate_fit(self, request, context):       
-        global model_path
-        request.idVehicle = request.idVehicle - 1        
-        print("SERVER ", (request.idVehicle), 
-        " - AGGREGATE_FIT request.number_of_vehicles:", 
-        request.number_of_vehicles, " - AGGREGATE_FIT request.num_examples: ", 
-        request.num_examples, "\n")
+        global model_path             
+        request.idVehicle = request.idVehicle - 1
+        self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(dataset_name=self.dataset, n_clients=1, non_iid=False) #All Data        
+        print(
+        "SERVER AGGREGATE_FIT",
+        " idVehicle: ", request.idVehicle, 
+        " number_of_vehicles: ", request.number_of_vehicles, 
+        " num_examples: ", request.num_examples, 
+        "\n"
+        )
 
         list_models = []
         modelName = model_path
@@ -139,6 +146,7 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
 
     def aggregate_sync_fit(self, request, context):
         global model_path
+        self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(dataset_name=self.dataset, n_clients=1, non_iid=False) #All Data             
         print("SERVER - AGGREGATE_SEMIASYNC_FIT msg: ", request.msg)
         
         list_models = []
@@ -166,6 +174,7 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
         # MAKE AGGREGATION
 
         data = model_agg.evaluate(self.x_train, self.y_train)
+        print("\n")
 
         history={}
         history["loss"] = [float(data[0])]
@@ -195,50 +204,58 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
 
     def initialize_parameters(self, request, context):
         global model_path, initial_path
-        
-        print("SERVER - INITIALIZE_PARAMETERS datasetPath: ", 
-        request.datasetPath, " modelName: ", request.modelName, 
-        " epochs: ", request.epochs, " batch_size: ", request.batch_size)        
+        self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(dataset_name=self.dataset, n_clients=1, non_iid=False) #All Data
+        print(
+        "SERVER - INITIALIZE_PARAMETERS",
+        " trainFlag: ", request.trainFlag,
+        " modelName: ", request.modelName, 
+        " epochs: ", request.epochs, 
+        " batch_size: ", request.batch_size
+        )        
 
         model_path = request.modelName+"global.h5"
         initial_path = request.modelName+"initial.h5"
-
-        # TRAINING PROCESS
-        model = ModelCreation().create_generic_model(self.x_train.shape, self.num_classes)
-
-        history = model.fit(self.x_train, self.y_train, epochs=request.epochs, batch_size=int(request.batch_size))
-        model.save(model_path)
-        model.save(initial_path)
-
-        with open(initial_path.replace("h5", "txt"), 'a') as file_save:
-            file_save.write("INITIALIZE_PARAMETERS: "+str(history.history)+"\n")
-        # TRAINING PROCESS
-
-        # WEIGHTS TO BYTES (FROM FLOWER)
-        weights = model.get_weights()
-        tensors = [ndarray_to_bytes(ndarray) for ndarray in weights]
-        # WEIGHTS TO BYTES (FROM FLOWER)
-
-        # CLEAN MEMORY
-        tf.keras.backend.clear_session()
-        del weights
-        del model
-        gc.collect() # Force Garbage Collect
-        # CLEAN MEMORY
         
-        return flexe_pb2.ModelReply(idVehicle=int(-1), tensors=tensors)
+        if request.trainFlag:
+	        # TRAINING PROCESS
+	        #model = ModelCreation().create_generic_model(self.x_train.shape, self.num_classes) #MNIST Model
+	        model = ModelCreation().create_CNN(self.x_train.shape, self.num_classes)
 
+	        history = model.fit(self.x_train, self.y_train, epochs=request.epochs, batch_size=int(request.batch_size))
+	        model.save(model_path)
+	        model.save(initial_path)
+
+	        with open(initial_path.replace("h5", "txt"), 'a') as file_save:
+		        file_save.write("INITIALIZE_PARAMETERS: "+str(history.history)+"\n")
+	        # TRAINING PROCESS
+
+	        # WEIGHTS TO BYTES (FROM FLOWER)
+	        weights = model.get_weights()
+	        tensors = [ndarray_to_bytes(ndarray) for ndarray in weights]
+	        # WEIGHTS TO BYTES (FROM FLOWER)
+
+	        # CLEAN MEMORY
+	        tf.keras.backend.clear_session()
+	        del weights
+	        del model
+	        gc.collect() # Force Garbage Collect
+	        # CLEAN MEMORY
+        else:
+	        tensors = []
+        
+        return flexe_pb2.ModelReply(idVehicle=int(-1), tensors=tensors, num_examples=int(self.y_train.size))
 
     def store_model(self, request, context):
         global model_path
         request.idVehicle = request.idVehicle - 1
-        print("SERVER ", (request.idVehicle), 
-        " - STORE_MODEL request.number_of_vehicles:", 
-        request.number_of_vehicles, 
-        " - STORE_MODEL request.num_examples: ", 
-        request.num_examples, "\n")
+        print(
+        "SERVER - STORE_MODEL", 
+        " idVehicle: ", request.idVehicle, 
+        " number_of_vehicles: ", request.number_of_vehicles, 
+        " num_examples: ", request.num_examples, "\n"
+        )
         
-    	# BYTES TO WEIGHTS  (FROM FLOWER)
+        # BYTES TO WEIGHTS  (FROM FLOWER)
         tensors = [bytes_to_ndarray(bytes) for bytes in request.tensors]
         # BYTES TO WEIGHTS  (FROM FLOWER)
         
@@ -274,16 +291,24 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
 
     #Client Functions 
     def fit(self, request, context):
-        global initial_path        
+        global initial_path       
         request.idVehicle = request.idVehicle - 1
-        print(request.idVehicle, " - FIT datasetPath: ", 
-        request.datasetPath, " modelName: ", request.modelName, 
-        " epochs: ", request.epochs, " batch_size: ", request.batch_size)
+        if self.non_iid == False:
+            self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(request.idVehicle).select_dataset(self.dataset, self.n_clients, self.non_iid)
+        else:
+            self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(request.idVehicle).select_dataset(self.dataset, self.n_clients, self.non_iid) 
+        print(
+        "CLIENT - FIT", 
+        " idVehicle: ", request.idVehicle, 
+        " trainFlag: ", request.trainFlag, 
+        " modelName: ", request.modelName, 
+        " epochs:", request.epochs, 
+        " batch_size: ", request.batch_size
+        )
         
 
         fileName = str(request.modelName)+str(request.idVehicle)+".h5"
         isExist = os.path.exists(fileName)
-
         if isExist:
             #LOAD MODEL IF EXIST
             model = tf.keras.models.load_model(fileName)
@@ -292,33 +317,43 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
             #LOAD INITIAL MODEL
             model = tf.keras.models.load_model(initial_path)
             #LOAD INITIAL MODEL
-
-        history = model.fit(self.x_train, self.y_train, epochs=request.epochs, batch_size=int(request.batch_size))
-        model.save(fileName)
-        
-        with open(fileName.replace("h5", "txt"), 'a') as file_save:
-            file_save.write("FIT: "+str(history.history)+"\n")
+            
+        if request.trainFlag:
+            history = model.fit(self.x_train, self.y_train, epochs=request.epochs, batch_size=int(request.batch_size))
+            print("\n")
+            model.save(fileName)
+            
+            with open(fileName.replace("h5", "txt"), 'a') as file_save:
+                file_save.write("FIT: "+str(history.history)+"\n")
 
         # WEIGHTS TO BYTES (FROM FLOWER)
         weights = model.get_weights()
         tensors = [ndarray_to_bytes(ndarray) for ndarray in weights]
         # WEIGHTS TO BYTES (FROM FLOWER)
-  
+
         # CLEAN MEMORY
         tf.keras.backend.clear_session()
         del weights
         del model
         gc.collect() # Force Garbage Collect
         # CLEAN MEMORY
-        return flexe_pb2.ModelReply(idVehicle=int(self.y_train.size), tensors=tensors)
-
-
+        
+        return flexe_pb2.ModelReply(idVehicle=int(request.idVehicle+1), tensors=tensors, num_examples=int(self.y_train.size))
 
     def evaluate(self, request, context):   
-        request.idVehicle = request.idVehicle - 1     
-        print(request.idVehicle, " - EVALUATE datasetPath: ", 
-        request.datasetPath, " modelName: ", request.modelName, 
-        " epochs: ", request.epochs, " batch_size: ", request.batch_size)
+        request.idVehicle = request.idVehicle - 1
+        if self.non_iid == False:
+            self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(request.idVehicle).select_dataset(self.dataset, self.n_clients, self.non_iid)
+        else:
+            self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(request.idVehicle).select_dataset(self.dataset, self.n_clients, self.non_iid) 
+        print(
+        "CLIENT - EVALUATE", 
+        " idVehicle: ", request.idVehicle, 
+        " trainFlag: ", request.trainFlag, 
+        " modelName: ", request.modelName, 
+        " epochs:", request.epochs, 
+        " batch_size: ", request.batch_size
+        )
 
         # LOAD MODEL
         fileName = str(request.modelName)+str(request.idVehicle)+".h5"
@@ -326,6 +361,7 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
         # LOAD MODEL
 
         data = model.evaluate(self.x_test, self.y_test)
+        print("\n")
         history={}
         history["loss"] = [float(data[0])]
         history["accuracy"] = [float(data[1])]
@@ -343,10 +379,15 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
 
     def update_model(self, request, context):
         global model_path
-        request.idVehicle = request.idVehicle - 1        
-        print(request.idVehicle, " - UPDATE_MODEL datasetPath: ", 
-        request.datasetPath, " modelName: ", request.modelName, 
-        " epochs: ", request.epochs, " batch_size: ", request.batch_size)
+        request.idVehicle = request.idVehicle - 1
+        print(
+        "CLIENT - UPDATE_MODEL", 
+        " idVehicle: ", request.idVehicle, 
+        " trainFlag: ", request.trainFlag, 
+        " modelName: ", request.modelName, 
+        " epochs:", request.epochs, 
+        " batch_size: ", request.batch_size, "\n"
+        )
 
         fileName = str(request.modelName)+str(request.idVehicle)+".h5"            
         model = tf.keras.models.load_model(model_path)
