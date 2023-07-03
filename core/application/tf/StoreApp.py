@@ -19,11 +19,12 @@ model_path = ""
 initial_path = ""
 
 class StoreApp(flexe_pb2_grpc.FlexeServicer):
-    def __init__(self, n_clients, dataset, non_iid):
+    def __init__(self, n_clients, dataset, n_classes, model_name, non_iid):
         self.dataset = dataset
         self.n_clients = n_clients
         self.non_iid = non_iid
-        self.num_classes = 10 #Pegar automatico
+        self.num_classes = n_classes
+        self.model_name = model_name
         self.device = tf.device("cuda:0" if tf.test.is_gpu_available() else "cpu")
                
     #Server Functions 
@@ -38,7 +39,7 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
 
     def aggregate_evaluate(self, request, context):
         global model_path
-        self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(dataset_name=self.dataset, n_clients=1, non_iid=False) #All Data                       
+        self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(dataset_name=self.dataset, n_clients=1, non_iid=False) #All Data                    
         print("SERVER - AGGREGATE_EVALUATE",
         " modelName: ", request.modelName, 
         " epochs: ", request.epochs, 
@@ -79,7 +80,7 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
     def aggregate_fit(self, request, context):       
         global model_path             
         request.idVehicle = request.idVehicle - 1
-        self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(dataset_name=self.dataset, n_clients=1, non_iid=False) #All Data        
+        self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(dataset_name=self.dataset, n_clients=1, non_iid=False) #All Data      
         print(
         "SERVER AGGREGATE_FIT",
         " idVehicle: ", request.idVehicle, 
@@ -146,7 +147,7 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
 
     def aggregate_sync_fit(self, request, context):
         global model_path
-        self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(dataset_name=self.dataset, n_clients=1, non_iid=False) #All Data             
+        self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(dataset_name=self.dataset, n_clients=1, non_iid=False) #All Data      
         print("SERVER - AGGREGATE_SEMIASYNC_FIT msg: ", request.msg)
         
         list_models = []
@@ -162,7 +163,6 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
         for veh_id in veh_ids:
             if veh_id.isdigit():
                 fileName = model_path.replace("global.h5", "")+str(int(veh_id) - 1)+"_cache.h5"
-                print("fileName CACHE: ", fileName)
                 model = tf.keras.models.load_model(fileName)
                 tensors = model.get_weights()
                 list_models.append((tensors, 50000))
@@ -204,30 +204,41 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
 
     def initialize_parameters(self, request, context):
         global model_path, initial_path
-        self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(dataset_name=self.dataset, n_clients=1, non_iid=False) #All Data
+        self.x_train, self.y_train, self.x_test, self.y_test = ManageDatasets(0).select_dataset(dataset_name=self.dataset, n_clients=1, non_iid=False) #All Data          
         print(
         "SERVER - INITIALIZE_PARAMETERS",
         " trainFlag: ", request.trainFlag,
         " modelName: ", request.modelName, 
         " epochs: ", request.epochs, 
-        " batch_size: ", request.batch_size
+        " batch_size: ", 1024
         )        
 
         model_path = request.modelName+"global.h5"
         initial_path = request.modelName+"initial.h5"
         
         if request.trainFlag:
-	        # TRAINING PROCESS
-	        #model = ModelCreation().create_generic_model(self.x_train.shape, self.num_classes) #MNIST Model
-	        model = ModelCreation().create_CNN(self.x_train.shape, self.num_classes)
-
-	        history = model.fit(self.x_train, self.y_train, epochs=request.epochs, batch_size=int(request.batch_size))
+	        # CREATE INITIALIZE MODEL PROCESS
+	        if self.model_name == "DNN":
+	            print("DNN!")
+	            model = ModelCreation().create_DNN(self.x_train.shape, self.num_classes)
+	        elif self.model_name == "CNN":
+	            print("CNN!")
+	            model = ModelCreation().create_CNN(self.x_train.shape, self.num_classes)
+	        elif self.model_name == "CNN_SIGN":
+	            print("SIGN!")
+	            model = ModelCreation().create_CNN_SIGN(self.x_train.shape, self.num_classes)
+	        else:
+	            print("Generic Model!")
+	            model = ModelCreation().create_generic_model(self.x_train.shape, self.num_classes)
+	        
+	        history = model.fit(self.x_train, self.y_train, epochs=request.epochs, batch_size=int(1024))
 	        model.save(model_path)
 	        model.save(initial_path)
 
 	        with open(initial_path.replace("h5", "txt"), 'a') as file_save:
 		        file_save.write("INITIALIZE_PARAMETERS: "+str(history.history)+"\n")
-	        # TRAINING PROCESS
+
+	        # CREATE INITIALIZE MODEL PROCESS
 
 	        # WEIGHTS TO BYTES (FROM FLOWER)
 	        weights = model.get_weights()
@@ -243,7 +254,7 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
         else:
 	        tensors = []
         
-        return flexe_pb2.ModelReply(idVehicle=int(-1), tensors=tensors, num_examples=int(self.y_train.size))
+        return flexe_pb2.ModelReply(idVehicle=int(-1), tensors=tensors, num_examples=int(-1))
 
     def store_model(self, request, context):
         global model_path
@@ -400,4 +411,3 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
         # CLEAN MEMORY 
 
         return flexe_pb2.GenericResponse(reply=int(1))   
-
