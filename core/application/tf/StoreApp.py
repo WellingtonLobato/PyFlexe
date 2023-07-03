@@ -93,7 +93,7 @@ class StoreApp(flexe_pb2_grpc.FlexeServicer):
         modelName = model_path
         
         # LOAD MODEL
-        fileName = modelName.replace("aggregate.h5", "")+str(request.idVehicle)+".h5"
+        fileName = modelName.replace("global.h5", "")+str(request.idVehicle)+".h5"
         model = tf.keras.models.load_model(fileName)
         # LOAD MODEL
         
