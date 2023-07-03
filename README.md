@@ -26,9 +26,17 @@ Please do follow the instructions from the official [conan documentation](https:
 
 ### GRPC installation
 Please do follow the instructions from the official [GRPC documentation](https://grpc.io/docs/languages/python/quickstart/)
+```
+python3 -m pip install grpcio
+python3 -m pip install grpcio-tools
+python3 -m pip install protobuf==3.20.1
+```
 
 ### TensorFlow installation (2.11.0 >=)
 Please do follow the instructions from the official [TensorFlow documentation](https://www.tensorflow.org/install)
+```
+python3 -m pip install tensorflow==2.11.0
+```
 
 ### PyTorch installation (1.13.1 >=)
 Please do follow the instructions from the official [PyTorch documentation](https://pytorch.org/tutorials/beginner/basics/intro.html)
@@ -40,6 +48,8 @@ In order to install the necessary packages to run PyFlexe, just run the followin
 ```
 poetry install
 ```
+
+After performing the installation, it may be necessary to run the `python3 -m grpc-tools.protoc -I . --python_out=. --grpc_python_out=. flexe.proto` command inside the `core/proto/` folder and replace the line `import flexe__pb2` with `import core.proto.flexe__pb2 as flexe__pb2`
 
 
 ## Running the server
