@@ -38,6 +38,18 @@ Please do follow the instructions from the official [TensorFlow documentation](h
 python3 -m pip install tensorflow==2.11.0
 ```
 
+### Scikit-Learn installation
+Please do follow the instructions from the official [Scikit-Learn documentation](https://scikit-learn.org/stable/install.html)
+```
+pip install scikit-learn
+```
+
+### OpenCV installation
+Please do follow the instructions from the official [OpenCV documentation](https://docs.opencv.org/4.x/d2/de6/tutorial_py_setup_in_ubuntu.html)
+```
+pip install opencv-python
+```
+
 ### PyTorch installation (1.13.1 >=)
 Please do follow the instructions from the official [PyTorch documentation](https://pytorch.org/tutorials/beginner/basics/intro.html)
 
