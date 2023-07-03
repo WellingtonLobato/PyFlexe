@@ -67,7 +67,7 @@ After performing the installation, it may be necessary to run the `python3 -m gr
 ## Running the server
 
 ```
-python server_flexe.py --ip 127.0.0.1 --dataset MNIST
+python server_flexe.py --ip 127.0.0.1:5000 --dataset MNIST
 ```
 
 
