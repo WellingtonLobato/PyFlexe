@@ -334,4 +334,3 @@ class FlexeApp(flexe_pb2_grpc.FlexeServicer):
         # CLEAN MEMORY 
 
         return flexe_pb2.GenericResponse(reply=int(1))    
-
