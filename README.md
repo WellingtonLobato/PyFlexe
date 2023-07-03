@@ -92,7 +92,10 @@ python server_flexe.py --ip 127.0.0.1 --dataset MNIST
 	├── img
 	│   └── Flexe_logo.png
 	└── server_flexe.py
-
+ 
+## Instant Flexe Virtual Machine
+Instant Flexe is a virtual machine you can use to quickly try out Flexe or to run Flexe on systems you do not have administrative access to.
+[Instant Flexe](https://drive.google.com/file/d/1AKOdnB7UYMtabeHEz1AlBlQEUpy-Vvdz/view?usp=sharing)
 
 ## Contributing
 
