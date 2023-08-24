@@ -61,7 +61,7 @@ In order to install the necessary packages to run PyFlexe, just run the followin
 poetry install
 ```
 
-After performing the installation, it may be necessary to run the `python3 -m grpc-tools.protoc -I . --python_out=. --grpc_python_out=. flexe.proto` command inside the `core/proto/` folder and replace the line `import flexe__pb2` with `import core.proto.flexe__pb2 as flexe__pb2`
+After performing the installation, it may be necessary to run the `python3 -m grpc.tools.protoc -I . --python_out=. --grpc_python_out=. flexe.proto` command inside the `core/proto/` folder and replace the line `import flexe__pb2` with `import core.proto.flexe__pb2 as flexe__pb2`
 
 
 ## Running the server
