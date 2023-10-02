@@ -30,6 +30,10 @@ Please do follow the instructions from the official [GRPC documentation](https:/
 python3 -m pip install grpcio
 python3 -m pip install grpcio-tools
 python3 -m pip install protobuf==3.20.1
+
+or
+
+python3 -m pip install protobuf==3.20.0 (Windows)
 ```
 
 ### TensorFlow installation (2.11.0 >=)
