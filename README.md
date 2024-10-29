@@ -59,20 +59,19 @@ Please do follow the instructions from the official [PyTorch documentation](http
 
 ### Installing
 
-In order to install the necessary packages to run PyFlexe, just run the following command in the root directory.
-
-```
-poetry install
-```
-
 After performing the installation, it may be necessary to run the `python3 -m grpc.tools.protoc -I . --python_out=. --grpc_python_out=. flexe.proto` command inside the `core/proto/` folder and replace the line `import flexe_pb2` with `import core.proto.flexe_pb2 as flexe_pb2`
 
 
 ## Running the server
 
 ```
-python server_flexe.py --ip 127.0.0.1:5000 --dataset MNIST
+python server_flexe.py --ip 127.0.0.1:5000 --dataset MNIST #OLD WAY
+python server_flexe.py #NEW VERSION
 ```
+
+## Instant Flexe
+You may use Instant Flexe, a virtual machine, to run Flexe to rapidly test.
+[Flexe](https://drive.google.com/file/d/1yyFuo72ncbeaA-aP82BeGSSuN7Sqy-Iq/view?usp=sharing)
 
 
 ## Project structure - main components 
